@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+. $_MSVM_ROOT/libexec/utils
+
+echo $VERSION

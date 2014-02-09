@@ -1,0 +1,8 @@
+BASE_URL="http://s3.amazonaws.com/Minecraft.Download/versions"
+
+# if the root is anywhere other than /usr/local, use the local var dir
+if [[ $_MSVM_ROOT != /usr/local/* ]]; then
+  BASE_DIR="$_MSVM_ROOT/var/msvm"
+else
+  BASE_DIR="/var/local/msvm"
+fi

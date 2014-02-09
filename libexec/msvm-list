@@ -11,7 +11,7 @@
 #   -f    Update the versions list regardless of changes
 #
 
-. $_MSVM_ROOT/lib/utils.sh
+. $_MSVM_ROOT/share/msvm/utils
 
 while getopts "arf" opt; do
   case $opt in
@@ -67,14 +67,22 @@ list() {
 
 # GO!
 
+# download version list if doesn't exist
+if [ ! -e $VERSIONS_FILE ]; then
+  download_save_etag $VERSIONS_URL $VERSIONS_FILE
+fi
+
+# if the "force" param is specified, download regardless of etag
 if [ -n "$FORCE" ]; then
-  log "force" $VERSIONS_FILE
+  warn "force" $VERSIONS_FILE
   download
   echo
+# if the "refresh" param is specified, check for a new version
 elif [ -n "$REFRESH" ]; then
-  log "refresh" $VERSIONS_FILE
+  warn "refresh" $VERSIONS_FILE
   download_if_updated $VERSIONS_FILE
   echo
 fi
 
+# output the list
 list

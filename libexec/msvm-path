@@ -5,7 +5,7 @@
 # Help: Outputs the path for a minecraft server jar
 #
 
-. $_MSVM_ROOT/lib/utils.sh
+. $_MSVM_ROOT/share/msvm/utils
 
 VERSION=${1-latest}
 TYPE=${2-release}

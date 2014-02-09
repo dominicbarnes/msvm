@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-# generic variables
 VERSION="0.0.1"
-BASE_DIR="$HOME/.msvm"
-BASE_URL="http://s3.amazonaws.com/Minecraft.Download/versions"
+
+# pull in config variables
+. $_MSVM_ROOT/share/msvm/config
 
 # versions meta
 VERSIONS_URL="$BASE_URL/versions.json"
@@ -18,6 +18,16 @@ VERSIONS_FILE="$BASE_DIR/versions.json"
 #
 log() {
   printf "  \033[36m%10s\033[0m : \033[90m%s\033[0m\n" $1 $2
+}
+
+#
+# Print a warning message
+#
+# @param type
+# @param message
+#
+warn() {
+  printf "  \033[33m%10s\033[0m : \033[90m%s\033[0m\n" $1 $2
 }
 
 #
@@ -158,9 +168,3 @@ is_installed() {
 latest_version() {
   cat $VERSIONS_FILE | jq -c -r ".latest.$1"
 }
-
-
-# download version list if doesn't exist
-if [ ! -e $VERSIONS_FILE ]; then
-  download_save_etag $VERSIONS_URL $VERSIONS_FILE
-fi

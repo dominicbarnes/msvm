@@ -5,7 +5,7 @@
 # Help: Deletes the specified jar version
 #
 
-. $_MSVM_ROOT/lib/utils.sh
+. $_MSVM_ROOT/share/msvm/utils
 
 
 VERSION=$1
