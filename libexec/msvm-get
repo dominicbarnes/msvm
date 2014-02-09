@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Usage: msvm get <version> [type] [options]
+# Summary: Get a specific version of the minecraft server jar
+#
+# Help: Retrieves a specific version of the minecraft server jar, allows getting
+# "latest" based on the versions JSON API
+#
+# Options:
+#
+#   -r    Install the version (check if this particular jar has changed)
+#   -f    Forces this version to be downloaded
+#
+
+. $_MSVM_ROOT/lib/utils.sh
+
+VERSION=${1-latest}
+TYPE=${2-release}
+
+if [ $VERSION == "latest" ]; then
+  VERSION=$(latest_version $TYPE)
+fi
+
+
+while getopts "rf" opt; do
+  case $opt in
+    r) REFRESH=1 ;;
+    f) FORCE=1 ;;
+
+    :)
+      error "Option $OPTARG requires an arguent"
+      exit 1
+      ;;
+
+    \?)
+      error "Unknown option $OPTARG"
+      exit 1
+      ;;
+  esac
+done
+
+
+#
+# Download the specified version, dump the headers and extract the etag
+#
+# @param version
+#
+download() {
+  download_save_etag $(jar_url $1) $(jar_path $1)
+}
+
+
+# GO!
+
+if ! is_installed $VERSION; then
+  download $VERSION
+elif [ -n "$FORCE" ]; then
+  log "force" $VERSION
+  download $VERSION
+elif [ -n "$REFRESH" ]; then
+  log "refresh" $VERSION
+  download_if_updated $(jar_path $VERSION)
+fi

@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Usage: msvm remove <version>
+# Summary: Deletes the specified jar version
+#
+# Help: Deletes the specified jar version
+#
+
+. $_MSVM_ROOT/lib/utils.sh
+
+
+VERSION=$1
+
+if [ -z $VERSION ]; then
+  error "version required"
+fi
+
+
+#
+# Remove the specified jar version's folder
+#
+# @param version
+#
+remove() {
+  local dir=$(dirname $(jar_path $1))
+
+  if [ -d $dir ]; then
+    rm -r $dir
+    log "removed" $1
+  else
+    error "$1 not installed"
+  fi
+}
+
+
+remove $VERSION

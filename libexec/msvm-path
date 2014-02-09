@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Usage: msvm path <version>
+# Summary: Get the path for a specific version of the minecraft server jar
+#
+# Help: Outputs the path for a minecraft server jar
+#
+
+. $_MSVM_ROOT/lib/utils.sh
+
+VERSION=${1-latest}
+TYPE=${2-release}
+
+if [ $VERSION == "latest" ]; then
+  VERSION=$(latest_version $TYPE)
+fi
+
+
+# GO!
+
+if ! is_installed $VERSION; then
+  error "$VERSION not installed"
+else
+  echo $(jar_path $VERSION)
+fi

@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# Usage: msvm list [options]
+# Summary: List available server versions
+#
+# Help: Displays available server versions (default is to only show installed versions)
+#
+# Options:
+#
+#   -a    Show all available versions
+#   -r    Update the versions list if it has changed
+#   -f    Update the versions list regardless of changes
+#
+
+. $_MSVM_ROOT/lib/utils.sh
+
+while getopts "arf" opt; do
+  case $opt in
+    a) ALL=1 ;;
+    r) REFRESH=1 ;;
+    f) FORCE=1 ;;
+
+    :)
+      error "Option $OPTARG requires an arguent"
+      exit 1
+      ;;
+
+    \?)
+      error "Unknown option $OPTARG"
+      exit 1
+      ;;
+  esac
+done
+
+
+#
+# Download the versions listing, dump the response headers and extract the ETag
+#
+download() {
+  download_save_etag $VERSIONS_URL $VERSIONS_FILE
+}
+
+#
+# Output available versions
+#
+list() {
+  local count=0
+
+  for v in $(cat $VERSIONS_FILE | jq -c ".versions | sort_by(.releaseTime) | reverse | .[]")
+  do
+    local id=$(echo $v | jq -c -r ".id")
+    local type=$(echo $v | jq -c -r ".type")
+
+    if is_installed $id; then
+      printf "\033[32m%15s\033[0m (%s)\n" $id $type
+      let count=count+1
+    elif [[ $ALL == "1" ]]; then
+      printf "%15s (%s)\n" $id $type
+      let count=count+1
+    fi
+  done
+
+  if [ $count == 0 ]; then
+    error "No versions found"
+  fi
+}
+
+
+# GO!
+
+if [ -n "$FORCE" ]; then
+  log "force" $VERSIONS_FILE
+  download
+  echo
+elif [ -n "$REFRESH" ]; then
+  log "refresh" $VERSIONS_FILE
+  download_if_updated $VERSIONS_FILE
+  echo
+fi
+
+list
